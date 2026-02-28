@@ -1,10 +1,10 @@
-import type { RadioBrowserStation } from "./types.js";
+import type { GeoStation, RadioBrowserStation } from "./types.js";
 
 const CACHE_REFRESH_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 const FETCH_BATCH_SIZE = 10000;
 
 let cachedBaseUrl: string | null = null;
-let stationCache: RadioBrowserStation[] = [];
+let stationCache: GeoStation[] = [];
 
 async function getBaseUrl(): Promise<string> {
   if (cachedBaseUrl) return cachedBaseUrl;
@@ -23,7 +23,7 @@ async function getBaseUrl(): Promise<string> {
   return cachedBaseUrl;
 }
 
-async function fetchAllStations(): Promise<RadioBrowserStation[]> {
+async function fetchAllStations(): Promise<GeoStation[]> {
   const base = await getBaseUrl();
   const stations: RadioBrowserStation[] = [];
   let offset = 0;
@@ -53,7 +53,7 @@ async function fetchAllStations(): Promise<RadioBrowserStation[]> {
     offset += batch.length;
   }
 
-  return stations.filter((s) => s.geo_lat !== 0 || s.geo_long !== 0);
+  return stations.filter((s): s is GeoStation => s.geo_lat !== null && s.geo_long !== null);
 }
 
 export async function initStationCache(): Promise<void> {
@@ -75,10 +75,10 @@ export async function initStationCache(): Promise<void> {
 export function findNearestStation(
   lat: number,
   lon: number
-): RadioBrowserStation | null {
+): GeoStation | null {
   if (stationCache.length === 0) return null;
 
-  let nearest: RadioBrowserStation | null = null;
+  let nearest: GeoStation | null = null;
   let minDistance = Infinity;
 
   for (const station of stationCache) {

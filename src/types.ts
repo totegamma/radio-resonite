@@ -27,6 +27,11 @@ export interface RadioBrowserStation {
   codec: string;
   bitrate: number;
   country: string;
+  geo_lat: number | null;
+  geo_long: number | null;
+}
+
+export interface GeoStation extends RadioBrowserStation {
   geo_lat: number;
   geo_long: number;
 }
