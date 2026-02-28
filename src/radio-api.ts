@@ -53,7 +53,14 @@ async function fetchAllStations(): Promise<GeoStation[]> {
     offset += batch.length;
   }
 
-  return stations.filter((s): s is GeoStation => s.geo_lat !== null && s.geo_long !== null);
+  return stations.filter((s): s is GeoStation =>
+    s.geo_lat !== null &&
+    s.geo_long !== null &&
+    Number.isFinite(s.geo_lat) &&
+    Number.isFinite(s.geo_long) &&
+    s.geo_lat >= -90 && s.geo_lat <= 90 &&
+    s.geo_long >= -180 && s.geo_long <= 180
+  );
 }
 
 export async function initStationCache(): Promise<void> {
